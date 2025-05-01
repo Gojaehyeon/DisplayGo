@@ -6,54 +6,50 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @EnvironmentObject private var shortcutManager: ShortcutManager
+    @Environment(\.dismiss) private var dismiss
+    @State private var isRecording = false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+        VStack(spacing: 20) {
+            Text("DisplayGo")
+                .font(.largeTitle)
+                .padding(.top)
+            
+            VStack(spacing: 15) {
+                Text("현재 단축키")
+                    .font(.headline)
+                
+                Text(shortcutManager.shortcut.isEmpty ? "설정되지 않음" : shortcutManager.shortcut)
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundColor(shortcutManager.shortcut.isEmpty ? .gray : .primary)
+                    .padding(.vertical, 5)
+                
+            Button(action: {
+                    isRecording.toggle()
+            }) {
+                    Text(isRecording ? "녹화 중... (키를 누르세요)" : "새 단축키 설정")
+                        .frame(width: 200)
                 }
-                .onDelete(perform: deleteItems)
+                .buttonStyle(.borderedProminent)
+                .disabled(isRecording)
             }
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-            .toolbar {
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+                    .padding()
+            .background(Color(.windowBackgroundColor))
+            .cornerRadius(10)
+            
+            Button("닫기") {
+                if isRecording {
+                    shortcutManager.stopMonitoring()
+                    isRecording = false
                 }
+                dismiss()
             }
-        } detail: {
-            Text("Select an item")
+            .buttonStyle(.bordered)
         }
+        .padding()
+        .frame(width: 400, height: 300)
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

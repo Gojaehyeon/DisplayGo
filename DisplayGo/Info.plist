@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>디스플레이 교환을 위해 키보드 입력이 필요합니다.</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSInputMonitoringUsageDescription</key>
+    <string>단축키를 감지하기 위해 키보드 입력 모니터링이 필요합니다.</string>
+    <key>com.apple.security.temporary-exception.apple-events</key>
+    <true/>
+</dict>
+</plist> 
