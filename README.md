@@ -1,7 +1,7 @@
 # DisplayGo 🖥️
 
 > Quickly swap your main display on macOS without dragging windows.
-> 드래그 없이, 단축키 하나로 맡여서 메인 디스플레이를 전환하세요.
+> 단축키 하나로 메인 디스플레이를 전환하세요.
 
 ---
 
