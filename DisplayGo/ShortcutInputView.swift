@@ -53,12 +53,8 @@ struct ShortcutInputView: View {
             print("ShortcutInputView가 나타났습니다.")
             print("현재 단축키: \(shortcutManager.shortcut)")
         }
-        .onChange(of: shortcutManager.shortcut) { newValue in
-            print("단축키가 변경되었습니다: \(newValue)")
-            if isRecording {
-                isRecording = false
-                dismiss()
-            }
+        .onChange(of: shortcutManager.shortcut) { oldValue, newValue in
+            isRecording = false
         }
         .onDisappear {
             if isRecording {

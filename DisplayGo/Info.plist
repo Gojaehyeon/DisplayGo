@@ -10,5 +10,11 @@
     <string>단축키를 감지하기 위해 키보드 입력 모니터링이 필요합니다.</string>
     <key>com.apple.security.temporary-exception.apple-events</key>
     <true/>
+    <key>NSAccessibilityUsageDescription</key>
+    <string>키보드 이벤트를 감지하기 위해 접근성 권한이 필요합니다.</string>
+    <key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
+    <array>
+        <string>com.apple.coreservices.launchservicesd</string>
+    </array>
 </dict>
 </plist> 

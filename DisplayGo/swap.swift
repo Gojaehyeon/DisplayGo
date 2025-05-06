@@ -45,6 +45,7 @@ public func swapMainDisplay() async throws {
     guard result == .success else { throw DisplaySwapError.configurationFailed }
 }
 
+
 class DisplayManager {
     static let shared = DisplayManager()
     
@@ -97,5 +98,31 @@ class DisplayManager {
             print("디스플레이가 2개 이상 필요합니다.")
             throw NSError(domain: "DisplayManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "디스플레이가 2개 이상 필요합니다."])
         }
+    }
+}
+
+func swapDisplays() {
+    let displays = NSScreen.screens
+    guard displays.count > 1 else {
+        print("외부 디스플레이가 연결되어 있지 않습니다.")
+        return
+    }
+    
+    // 현재 메인 디스플레이 찾기
+    let currentMain = displays.first { $0.frame.origin == .zero }
+    guard let currentMain = currentMain else { return }
+    
+    // 다음 디스플레이 찾기
+    let currentIndex = displays.firstIndex(of: currentMain) ?? 0
+    let nextIndex = (currentIndex + 1) % displays.count
+    let nextDisplay = displays[nextIndex]
+    
+    // 디스플레이 설정 변경
+    let displayID = CGMainDisplayID()
+    let nextDisplayID = nextDisplay.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID ?? 0
+    
+    if let displayMode = CGDisplayCopyDisplayMode(nextDisplayID) {
+        CGDisplaySetDisplayMode(displayID, displayMode, nil)
+        print("디스플레이 전환 완료: \(nextDisplayID)")
     }
 }
