@@ -15,6 +15,11 @@ class HotKeyPopoverViewController: NSViewController {
     private let changeButton = NSButton(title: "변경", target: nil, action: nil)
     private let saveButton = NSButton(title: "저장", target: nil, action: nil)
     private var keyMonitor: Any?
+    private let isKorean = Locale.preferredLanguages.first?.hasPrefix("ko") == true
+    private var currentHotKeyPrefix: String { isKorean ? "현재 단축키: " : "Current Hotkey: " }
+    private var changeButtonTitle: String { isKorean ? "변경" : "Change" }
+    private var saveButtonTitle: String { isKorean ? "저장" : "Save" }
+    private var inputGuideText: String { isKorean ? "새 단축키를 입력하세요..." : "Enter new hotkey..." }
 
     override func loadView() {
         self.view = NSView(frame: NSRect(x: 0, y: 0, width: 240, height: 120))
@@ -32,11 +37,15 @@ class HotKeyPopoverViewController: NSViewController {
         changeButton.translatesAutoresizingMaskIntoConstraints = false
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         
+        changeButton.title = changeButtonTitle
+        saveButton.title = saveButtonTitle
+        
         // 버튼 그룹 StackView
         let buttonStack = NSStackView(views: [changeButton, saveButton])
         buttonStack.orientation = .horizontal
         buttonStack.spacing = 16
-        buttonStack.alignment = .centerY
+        buttonStack.alignment = .centerX
+        buttonStack.distribution = .equalCentering
         buttonStack.translatesAutoresizingMaskIntoConstraints = false
         
         // 전체 StackView
@@ -67,11 +76,12 @@ class HotKeyPopoverViewController: NSViewController {
     }
 
     private func updateHotKeyLabel() {
-        currentHotKeyLabel.stringValue = "현재 단축키: " + HotKeyManager.shared.currentHotKeyDescription()
+        currentHotKeyLabel.stringValue = currentHotKeyPrefix + HotKeyManager.shared.currentHotKeyDescription()
+        currentHotKeyLabel.alignment = .center
     }
 
     @objc private func beginKeyCapture() {
-        currentHotKeyLabel.stringValue = "새 단축키를 입력하세요..."
+        currentHotKeyLabel.stringValue = inputGuideText
         currentHotKeyLabel.alignment = .center
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self = self else { return event }
@@ -85,7 +95,7 @@ class HotKeyPopoverViewController: NSViewController {
                 HotKeyManager.shared.updateHotKey(key: key, modifiers: modifiers)
                 self.updateHotKeyLabel()
             } else {
-                self.currentHotKeyLabel.stringValue = "지원하지 않는 키입니다. 다시 시도하세요."
+                self.currentHotKeyLabel.stringValue = self.isKorean ? "지원하지 않는 키입니다. 다시 시도하세요." : "Unsupported key. Try again."
             }
 
             return nil
