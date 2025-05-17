@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		248142702DD83F4B00781A32 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 2481426F2DD83F4B00781A32 /* HotKey */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2481423D2DD83DF100781A32 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				248142702DD83F4B00781A32 /* HotKey in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = DisplayGo;
 			packageProductDependencies = (
+				2481426F2DD83F4B00781A32 /* HotKey */,
 			);
 			productName = DisplayGo;
 			productReference = 248142292DD83DF000781A32 /* DisplayGo.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 248142202DD83DF000781A32;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2481426E2DD83F4B00781A32 /* XCRemoteSwiftPackageReference "HotKey" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2481422A2DD83DF000781A32 /* Products */;
 			projectDirPath = "";
@@ -551,6 +560,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2481426E2DD83F4B00781A32 /* XCRemoteSwiftPackageReference "HotKey" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/soffes/HotKey";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2481426F2DD83F4B00781A32 /* HotKey */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2481426E2DD83F4B00781A32 /* XCRemoteSwiftPackageReference "HotKey" */;
+			productName = HotKey;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 248142212DD83DF000781A32 /* Project object */;
 }
