@@ -4,7 +4,5 @@
 <dict>
     <key>NSHumanReadableCopyright</key>
     <string>© 2025 gojaehyun. All rights reserved.</string>
-    <key>LSApplicationCategoryType</key>
-    <string>public.app-category.utilities</string>
 </dict>
 </plist>
