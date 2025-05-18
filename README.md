@@ -23,23 +23,19 @@
 
 ## 🙋‍♂️ Author / 제작자
 
-<table>
-  <tr>
-    <td>
-      <img src="https://avatars.githubusercontent.com/u/149154032?v=4" width="120" style="border-radius: 10px;" />
-    </td>
-    <td style="padding-left: 16px;">
-      <strong>고재현 (Go Jaehyun)</strong><br>
-      Indie iOS/macOS Developer · Product Designer<br><br>
-      <ul>
-        <li>GitHub: <a href="https://github.com/Gojaehyeon">@Gojaehyeon</a></li>
-        <li>✨ I make tools that simplify daily workflows.</li>
-        <li>🛠️ Always building for real-life use cases.</li>
-        <li>🚀 Dreaming of working in Silicon Valley</li>
-      </ul>
-    </td>
-  </tr>
-</table>
+<div style="display: flex; align-items: center; gap: 24px;">
+  <img src="https://avatars.githubusercontent.com/u/149154032?v=4" width="140" style="border-radius: 10px;" />
+  <div>
+    <strong>고재현 (Go Jaehyun)</strong><br>
+    Indie iOS/macOS Developer · Product Designer<br><br>
+    <ul>
+      <li>GitHub: <a href="https://github.com/Gojaehyeon">@Gojaehyeon</a></li>
+      <li>✨ I make tools that simplify daily workflows.</li>
+      <li>🛠️ Always building for real-life use cases.</li>
+      <li>🚀 Dreaming of working in Silicon Valley</li>
+    </ul>
+  </div>
+</div>
 
 ---
 
