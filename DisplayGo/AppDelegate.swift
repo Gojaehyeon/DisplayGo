@@ -35,6 +35,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let swapItem = NSMenuItem(title: isKorean ? "디스플레이 전환" : "Swap Display", action: #selector(swapDisplayClicked), keyEquivalent: "")
         swapItem.image = NSImage(named: NSImage.refreshTemplateName)
         menu.addItem(swapItem)
+        // Open Display Settings item
+        let openSettingsItem = NSMenuItem(title: isKorean ? "디스플레이 정렬" : "Open Display Arrangement", action: #selector(openDisplaySettings), keyEquivalent: "")
+        openSettingsItem.image = NSImage(named: NSImage.preferencesGeneralName)
+        menu.addItem(openSettingsItem)
         // Change Hotkey item with compose icon
         let hotKeyTitle = isKorean ? "단축키 변경 (" : "Change Hotkey ("
         let hotKeyItem = NSMenuItem(title: hotKeyTitle + HotKeyManager.shared.currentHotKeyDescription() + ")", action: #selector(changeHotKeyClicked), keyEquivalent: "")
@@ -186,5 +190,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         alert.alertStyle = .informational
         alert.addButton(withTitle: isKorean ? "확인" : "OK")
         alert.runModal()
+    }
+    @objc func openDisplaySettings() {
+        let script = """
+        tell application "System Settings"
+            activate
+            reveal anchor "displaysArrangement" of pane id "com.apple.Display-Settings.extension"
+        end tell
+        """
+        var error: NSDictionary?
+        if let appleScript = NSAppleScript(source: script) {
+            appleScript.executeAndReturnError(&error)
+            if let error = error {
+                print("AppleScript error: \(error)")
+            }
+        }
     }
 }
