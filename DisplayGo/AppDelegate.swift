@@ -23,7 +23,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
         // About item with info icon
         let aboutItem = NSMenuItem(title: isKorean ? "DisplayGo 정보" : "About DisplayGo", action: #selector(showAbout), keyEquivalent: "")
-        aboutItem.image = NSImage(named: NSImage.smartBadgeTemplateName)
+        aboutItem.image = NSImage(systemSymbolName: "info.circle", accessibilityDescription: nil)
         aboutItem.image?.isTemplate = true
         menu.addItem(aboutItem)
         // How to use item with action icon
@@ -31,13 +31,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         howToItem.image = NSImage(named: NSImage.actionTemplateName)
         menu.addItem(howToItem)
         menu.addItem(NSMenuItem.separator())
-        // Swap Display item with smart badge icon
+        // Swap Display item with swap icon
         let swapItem = NSMenuItem(title: isKorean ? "디스플레이 전환" : "Swap Display", action: #selector(swapDisplayClicked), keyEquivalent: "")
-        swapItem.image = NSImage(named: NSImage.refreshTemplateName)
+        swapItem.image = NSImage(systemSymbolName: "rectangle.2.swap", accessibilityDescription: nil)
+        swapItem.image?.isTemplate = true
         menu.addItem(swapItem)
         // Open Display Settings item
-        let openSettingsItem = NSMenuItem(title: isKorean ? "디스플레이 정렬" : "Open Display Arrangement", action: #selector(openDisplaySettings), keyEquivalent: "")
-        openSettingsItem.image = NSImage(named: NSImage.preferencesGeneralName)
+        let openSettingsItem = NSMenuItem(title: isKorean ? "디스플레이 설정 열기" : "Open Display Settings", action: #selector(openDisplaySettings), keyEquivalent: "")
+        openSettingsItem.image = NSImage(named: NSImage.smartBadgeTemplateName)
+        openSettingsItem.image?.isTemplate = true
         menu.addItem(openSettingsItem)
         // Change Hotkey item with compose icon
         let hotKeyTitle = isKorean ? "단축키 변경 (" : "Change Hotkey ("
@@ -192,18 +194,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         alert.runModal()
     }
     @objc func openDisplaySettings() {
-        let script = """
-        tell application "System Settings"
-            activate
-            reveal anchor "displaysArrangement" of pane id "com.apple.Display-Settings.extension"
-        end tell
-        """
-        var error: NSDictionary?
-        if let appleScript = NSAppleScript(source: script) {
-            appleScript.executeAndReturnError(&error)
-            if let error = error {
-                print("AppleScript error: \(error)")
-            }
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.displays") {
+            NSWorkspace.shared.open(url)
         }
     }
 }
