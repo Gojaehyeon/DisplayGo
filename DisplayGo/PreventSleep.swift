@@ -7,6 +7,7 @@ class PreventSleepManager: NSObject, ObservableObject {
     @Published var isPreventingSleep = false
     @Published var selectedDuration: TimeInterval?
     private var assertionID: IOPMAssertionID = 0
+    private var displaySleepAssertionID: IOPMAssertionID = 0
     var timer: Timer?
     
     enum Duration: CaseIterable {
@@ -67,6 +68,13 @@ class PreventSleepManager: NSObject, ObservableObject {
     func enableSleepPrevention(duration: Duration? = nil) {
         var assertionID = IOPMAssertionID(0)
         let reason = "DisplayGo: Keep system awake" as CFString
+        var displaySleepAssertionID = IOPMAssertionID(0)
+        let resultDisplay = IOPMAssertionCreateWithName(
+            kIOPMAssertionTypePreventUserIdleDisplaySleep as CFString,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            reason,
+            &displaySleepAssertionID
+        )
         let result = IOPMAssertionCreateWithName(
             kIOPMAssertionTypePreventUserIdleSystemSleep as CFString,
             IOPMAssertionLevel(kIOPMAssertionLevelOn),
@@ -76,6 +84,7 @@ class PreventSleepManager: NSObject, ObservableObject {
         
         if result == kIOReturnSuccess {
             self.assertionID = assertionID
+            self.displaySleepAssertionID = displaySleepAssertionID
             self.isPreventingSleep = true
             
             if let duration = duration, let seconds = duration.seconds {
@@ -94,6 +103,7 @@ class PreventSleepManager: NSObject, ObservableObject {
     func disableSleepPrevention() {
         if isPreventingSleep {
             IOPMAssertionRelease(assertionID)
+            IOPMAssertionRelease(displaySleepAssertionID)
             isPreventingSleep = false
             selectedDuration = nil
             timer?.invalidate()
@@ -135,9 +145,6 @@ struct PreventSleepView: View {
                 ForEach(PreventSleepManager.Duration.allCases, id: \.self) { duration in
                     Button(action: {
                         if duration == .off {
-                            if !sleepManager.isPreventingSleep {
-                                return
-                            }
                             sleepManager.disableSleepPrevention()
                         } else {
                             sleepManager.enableSleepPrevention(duration: duration)
