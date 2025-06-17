@@ -1,11 +1,13 @@
 import Cocoa
 import HotKey
+import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     var isKorean: Bool { Locale.preferredLanguages.first?.hasPrefix("ko") == true }
     var hotKeyMenuItem: NSMenuItem?
     var hotKeyPopover: NSPopover?
+    let sleepManager = PreventSleepManager()
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -21,36 +23,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         let menu = NSMenu()
-        // About item with info icon
+        
+        // About item
         let aboutItem = NSMenuItem(title: isKorean ? "DisplayGo 정보" : "About DisplayGo", action: #selector(showAbout), keyEquivalent: "")
-        aboutItem.image = NSImage(named: NSImage.smartBadgeTemplateName)
-        aboutItem.image?.isTemplate = true
         menu.addItem(aboutItem)
-        // How to use item with action icon
+        
+        // How to use item
         let howToItem = NSMenuItem(title: isKorean ? "사용 방법" : "How to use?", action: #selector(showHowToUse), keyEquivalent: "")
-        howToItem.image = NSImage(named: NSImage.actionTemplateName)
         menu.addItem(howToItem)
+        
         menu.addItem(NSMenuItem.separator())
-        // Swap Display item with smart badge icon
-        let swapItem = NSMenuItem(title: isKorean ? "디스플레이 전환" : "Swap Display", action: #selector(swapDisplayClicked), keyEquivalent: "")
-        swapItem.image = NSImage(named: NSImage.refreshTemplateName)
-        menu.addItem(swapItem)
+        
+        // Swap Display item
+//        let swapItem = NSMenuItem(title: isKorean ? "디스플레이 전환" : "Swap Display", action: #selector(swapDisplayClicked), keyEquivalent: "")
+//        menu.addItem(swapItem)
+        
         // Open Display Settings item
-        let openSettingsItem = NSMenuItem(title: isKorean ? "디스플레이 정렬" : "Open Display Arrangement", action: #selector(openDisplaySettings), keyEquivalent: "")
-        openSettingsItem.image = NSImage(named: NSImage.preferencesGeneralName)
+        let openSettingsItem = NSMenuItem(title: isKorean ? "디스플레이 설정 열기" : "Open Display Settings", action: #selector(openDisplaySettings), keyEquivalent: "")
         menu.addItem(openSettingsItem)
-        // Change Hotkey item with compose icon
+        
+        // Change Hotkey item
         let hotKeyTitle = isKorean ? "단축키 변경 (" : "Change Hotkey ("
         let hotKeyItem = NSMenuItem(title: hotKeyTitle + HotKeyManager.shared.currentHotKeyDescription() + ")", action: #selector(changeHotKeyClicked), keyEquivalent: "")
-        hotKeyItem.image = NSImage(named: NSImage.touchBarComposeTemplateName)
         menu.addItem(hotKeyItem)
         self.hotKeyMenuItem = hotKeyItem
         menu.addItem(NSMenuItem.separator())
-        // Quit item with stop progress icon
+
+        // Add Sleep Prevention menu item with inline duration buttons
+        let preventSleepItem = NSMenuItem()
+        preventSleepItem.view?.setFrameSize(NSSize(width: 280, height: 70))  // Increased height
+        let preventSleepHostingView = NSHostingView(rootView: PreventSleepView(sleepManager: sleepManager))
+        preventSleepHostingView.frame = NSRect(x: 0, y: 0, width: 280, height: 70)  // Increased height
+        preventSleepItem.view = preventSleepHostingView
+        menu.addItem(preventSleepItem)
+
+        menu.addItem(NSMenuItem.separator())
+        
+        // Quit item
         let quitTitle = isKorean ? "종료" : "Quit"
         let quitItem = NSMenuItem(title: quitTitle, action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
-        quitItem.image = NSImage(named: NSImage.stopProgressTemplateName)
         menu.addItem(quitItem)
+        
         statusItem?.menu = menu
         
         HotKeyManager.shared.registerDefaultHotKey()
@@ -172,16 +185,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ? """
             사용방법: 앱을 실행 후 원하는 단축키를 설정하면 됩니다.
             (기본 단축키는 ⌘ + ⌥ + 1)
-            
+
             * 아직 두 개 이상의 디스플레이는 지원하지 않습니다.
             * 메뉴바 앱이 실행 중이어야 작동하며, 독에는 앱이 보이지 않는 게 정상입니다.
+            * 잠자기 방지 기능을 사용할 수 있습니다.
             """
         : """
             How to use: Launch the app and set your preferred shortcut.
             (The default shortcut is ⌘ + ⌥ + 1)
-            
+
             * Currently does not support more than two displays.
             * The app must be running in the menu bar and it is normal that it does not appear in the Dock.
+            * You can use the sleep prevention feature from the menu.
             """
         
         let alert = NSAlert()
@@ -192,18 +207,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         alert.runModal()
     }
     @objc func openDisplaySettings() {
-        let script = """
-        tell application "System Settings"
-            activate
-            reveal anchor "displaysArrangement" of pane id "com.apple.Display-Settings.extension"
-        end tell
-        """
-        var error: NSDictionary?
-        if let appleScript = NSAppleScript(source: script) {
-            appleScript.executeAndReturnError(&error)
-            if let error = error {
-                print("AppleScript error: \(error)")
-            }
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.displays") {
+            NSWorkspace.shared.open(url)
         }
     }
 }
