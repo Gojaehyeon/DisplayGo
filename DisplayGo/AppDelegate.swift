@@ -1,6 +1,7 @@
 import Cocoa
 import HotKey
 import SwiftUI
+import ServiceManagement
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
@@ -8,6 +9,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var hotKeyMenuItem: NSMenuItem?
     var hotKeyPopover: NSPopover?
     let sleepManager = PreventSleepManager()
+    var autoStartMenuItem: NSMenuItem?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -47,8 +49,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let hotKeyItem = NSMenuItem(title: hotKeyTitle + HotKeyManager.shared.currentHotKeyDescription() + ")", action: #selector(changeHotKeyClicked), keyEquivalent: "")
         menu.addItem(hotKeyItem)
         self.hotKeyMenuItem = hotKeyItem
-        menu.addItem(NSMenuItem.separator())
 
+        // Launch at Login (Auto Start) item
+        let autoStartTitle = isKorean ? "맥북 켜면 자동 실행" : "Launch at Login"
+        let autoStartItem = NSMenuItem(title: autoStartTitle, action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+        autoStartItem.state = UserDefaults.standard.bool(forKey: "launchAtLoginEnabled") ? .on : .off
+        autoStartItem.target = self
+        menu.addItem(autoStartItem)
+        self.autoStartMenuItem = autoStartItem
+
+        // 실제 자동 실행 등록 상태와 메뉴 상태 동기화
+        if #available(macOS 13.0, *) {
+            let defaults = UserDefaults.standard
+            let hasKey = defaults.object(forKey: "launchAtLoginEnabled") != nil
+            if !hasKey {
+                // 기본값: launch at login 활성화
+                do {
+                    try SMAppService.mainApp.register()
+                } catch {
+                    print("기본 자동 실행 등록 실패: \(error)")
+                }
+                defaults.set(true, forKey: "launchAtLoginEnabled")
+            }
+            let isRegistered = SMAppService.mainApp.status == .enabled
+            autoStartItem.state = isRegistered ? .on : .off
+            defaults.set(isRegistered, forKey: "launchAtLoginEnabled")
+        }
+        
+        menu.addItem(NSMenuItem.separator())
+        
         // Add Sleep Prevention menu item with inline duration buttons
         let preventSleepItem = NSMenuItem()
         preventSleepItem.view?.setFrameSize(NSSize(width: 280, height: 70))  // Increased height
@@ -209,6 +238,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func openDisplaySettings() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.displays") {
             NSWorkspace.shared.open(url)
+        }
+    }
+    
+    @objc func toggleLaunchAtLogin(_ sender: NSMenuItem) {
+        let enabled = sender.state != .on
+        sender.state = enabled ? .on : .off
+        UserDefaults.standard.set(enabled, forKey: "launchAtLoginEnabled")
+        // ServiceManagement 프레임워크 사용
+        if #available(macOS 13.0, *) {
+            if enabled {
+                do {
+                    try SMAppService.mainApp.register()
+                } catch {
+                    print("자동 실행 등록 실패: \(error)")
+                }
+            } else {
+                do {
+                    try SMAppService.mainApp.unregister()
+                } catch {
+                    print("자동 실행 해제 실패: \(error)")
+                }
+            }
+        } else {
+            // macOS 13 미만: SMLoginItemSetEnabled 사용 (별도 helper 필요, 여기선 안내만)
+            print("macOS 13 미만에서는 별도 런치 헬퍼가 필요합니다.")
         }
     }
 }
